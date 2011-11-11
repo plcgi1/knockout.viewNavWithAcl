@@ -1,0 +1,13 @@
+{
+    rows : [
+        { id : '1', login : 'aaaaa' , fio : 'AAAAAAAA' },
+        { id : '2', login : 'bbbbb' , fio : 'BBBBBB' },
+        { id : '3', login : 'ccccc' , fio : 'CCCCCC' },
+        { id : '4', login : 'ddddd' , fio : 'DDDDDD' },
+        { id : '5', login : 'eeeee' , fio : 'EEEEEE' },
+        { id : '6', login : 'fffff' , fio : 'FFFFFF' },
+        { id : '7', login : 'ggggg' , fio : 'GGGGGG' },
+        { id : '8', login : 'rrrrr' , fio : 'RRRRRR' },
+        { id : '9', login : 'wwwww' , fio : 'WWWWWW' }
+    ]
+}

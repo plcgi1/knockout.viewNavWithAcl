@@ -1,0 +1,7 @@
+{
+    "acl" : [
+        { "name" : "edit", "url" : "/url/to/edit", "type" : "PUT" },
+        { "name" : "remove", "url" : "/url/to/delete", "type" : "DELETE" },
+        { "name" : "get", "url" : "/url/to/get", "type" : "GET" }
+    ]
+}

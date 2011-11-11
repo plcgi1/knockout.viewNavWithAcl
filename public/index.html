@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	
+	<title>My Knockout bindings</title>
+	<link rel="stylesheet" href="/css/style.css" type="text/css" media="screen"></link> 
+	<link rel="stylesheet" href="/css/bootstrap.css">
+	<link rel="stylesheet" href="/css/index.css">
+		
+    <!--[if lt IE 7]>
+        <script src="http://ie7-js.googlecode.com/svn/version/2.0(beta3)/IE7.js" type="text/javascript"></script>
+    <![endif]-->
+	<script type="text/javascript" src="/js/min/jquery.js"></script>
+	<script src="/js/dev/jquery.tmpl.js"></script>
+    <script src="/js/dev/knockout-latest.debug.js"></script>
+    <script src="/js/dev/knockout.viewNavWithAcl.js"></script>
+    <script src="/js/dev/Dumper.js"></script>
+    <script src="/js/dev/acl.js"></script>
+ 
+</head>
+
+<body>
+	<div class="topbar">
+		<div class="fill">
+			<div class="container">
+				<a class="brand" href="#">My bindings for knockout.js</a>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="content">
+			<div>
+			<div class="row">
+				<div class="span4 item">
+					<h2>ACL binding</h2>
+					<h3>Description</h3>
+					<p>
+						Sometimes you need some links/buttons on page shown for user with corresponding rights to action.
+						You can describe such buttons/links in any place of page.They will be shown only if current user has right to them.
+						All rights got from server as json struct and store in memory - in your viewModel implementation
+						Example of code for implementation:
+						<pre>
+(function(){
+    var AclModel = {
+	// url to get acl data from server
+        url: '/js/data/acl.json',
+	// acl data from server
+        acl: ko.observableArray([]),
+	// demo method to show acl data
+        aclAsJSONString: function(){
+            return JSON.stringify(this.acl());
+        },
+	// init data from server
+        init: function(){
+            var getUniqueTime = function () {
+                var time = new Date().getTime();
+                while (time == new Date().getTime());
+                return new Date().getTime();
+            };
+            var url = AclModel.url + '?_='+getUniqueTime(); 
+            $.ajax({
+                url: url,
+                dataType: 'application/json',
+                type: 'GET',
+                success: function(req){
+                    req = eval('('+req+')');
+                    
+                    AclModel.acl(req.acl);
+                },
+                error: function(e){
+                    alert('er: ' + e);
+                }
+            });
+        },
+	// method for reload server data
+        reload: function(){
+            var self = this;
+            self.init();
+        },
+	// implementation of methods for allowed actions in page
+        edit: function(){
+            DumperAlert(arguments);
+        },
+        remove: function(){
+            DumperAlert(arguments);
+        },
+        get: function(){
+            DumperAlert(arguments);
+        }
+    };
+    $(document).ready(function(){
+        AclModel.init();
+        ko.applyBindings(AclModel);
+    });
+})();
+
+						</pre>
+						<h4>Structure of server acl data</h4>
+						<pre>
+{
+    "acl" : [
+        { "name" : "edit", "url" : "/url/to/edit", "type" : "PUT" },
+        { "name" : "remove", "url" : "/url/to/delete", "type" : "DELETE" },
+        { "name" : "get", "url" : "/url/to/get", "type" : "GET" }
+    ]
+}
+						</pre>
+						<h4>Binding data with action</h4>
+						<pre>
+&lt;div data-bind='viewNavWithAcl: { data: acl, name: "edit", action: edit, label : "Editt" }'&gt;&lt;/div &gt;
+						</pre>
+					</p>
+				</div>
+				<div class="span10 item">
+					<h2>DEMO</h2>
+					<h4>ACL data from server</h4>
+					<textarea name="" id="" rows="10" cols="25" data-bind="text: aclAsJSONString()"></textarea>	
+					<input type="button" data-bind='click: reload' value="RELOAD ACL DATA"/>
+					<p>
+					<h4>With generic template</h4>
+				<ul class="nav">
+					<li data-bind='viewNavWithAcl: { data: acl, name: "edit", action: edit, label : "Editt" }'></li>
+					<li data-bind='viewNavWithAcl: { data: acl, name: "remove", action: remove, label : "Remove" }'></li>
+					<li data-bind='viewNavWithAcl: { data: acl, name: "get", action: get, label : "GET" }'></li>
+				</ul>
+					</p><br/>
+				<p>
+				<h4>From templates</h4>
+				<span data-bind='viewNavWithAcl: { template: "tpl1",  data: acl, name: "get", action: get, label : "GET" }'></span>
+				<span data-bind='viewNavWithAcl: { template: "tpl1",  data: acl, name: "edit", action: get, label : "EDIT" }'></span>
+				<span data-bind='viewNavWithAcl: { template: "tpl1",  data: acl, name: "remove", action: get, label : "REMOVE" }'></span>
+				<span data-bind='viewNavWithAcl: { template: "tpl2",  data: acl, name: "get", action: get, label : "GET" }'></span>
+				<span data-bind='viewNavWithAcl: { template: "tpl2",  data: acl, name: "edit", action: get, label : "EDIT" }'></span>
+				<span data-bind='viewNavWithAcl: { template: "tpl2",  data: acl, name: "remove", action: get, label : "REMOVE" }'></span>
+				</p>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+	
+	<script type="text/html" id="tpl1">
+		<div class="btn">${ label}</div>
+	</script>
+	<script type="text/html" id="tpl2">
+		<h2 >${ label}</h2>
+	</script>
+</body>
+
+</html>
